@@ -119,15 +119,17 @@ animation:shake .4s infinite;
 <button id="muteBtn">Mute</button>
 </div>
 
-<div class="container">
-<h1 id="title" class="title">Menuju Tahun Baru 2026</h1>
-
 <div class="message">
 Klik layar untuk kembang api<br>
 Double klik = super ledakan
 </div>
 
+<button onclick="shareWA()" style="margin-bottom:20px">
+Bagikan ke WhatsApp
+</button>
+
 <div class="countdown">
+
 <span id="days">0</span>Hari
 <span id="hours">0</span>Jam
 <span id="minutes">0</span>Menit
@@ -143,7 +145,7 @@ Double klik = super ledakan
 
 <script>
 /* ===== CONFIG ===== */
-const nama = "Nyus"; // GANTI NAMA DI SINI
+const nama = "semua"; // GANTI NAMA DI SINI
 const target = new Date("2026-01-01T00:00:00").getTime();
 
 /* ===== AUDIO SAFE ===== */
@@ -224,7 +226,7 @@ setTimeout(()=>boom(innerWidth/2,innerHeight/2,300),i*350);
 setTimeout(()=>{
 document.body.classList.remove("shake");
 title.classList.remove("glitch");
-title.textContent=`🎉 Selamat Tahun Baru 2026, ${nama}! 🎉`;
+title.textContent=`Selamat Tahun Baru 2026, ${nama}! `;
 },2000);
 
 music.volume=.6;
