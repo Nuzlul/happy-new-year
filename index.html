@@ -1,0 +1,246 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Menuju Tahun Baru 2026</title>
+
+<style>
+*{box-sizing:border-box}
+
+body{
+margin:0;
+overflow:hidden;
+background:radial-gradient(circle at center,#1a1a2e,#000);
+font-family:Arial,sans-serif;
+color:white;
+height:100vh;
+text-align:center;
+cursor:pointer;
+}
+
+/* BACKGROUND STARS */
+.parallax{
+position:fixed;
+inset:0;
+background:
+radial-gradient(2px 2px at 20% 30%,#fff,transparent),
+radial-gradient(2px 2px at 70% 40%,#fff,transparent),
+radial-gradient(1px 1px at 50% 80%,#fff,transparent);
+opacity:.4;
+}
+
+/* MAIN */
+.container{
+position:absolute;
+top:50%;
+left:50%;
+transform:translate(-50%,-50%);
+z-index:10;
+width:90%;
+max-width:800px;
+}
+
+h1{
+font-size:clamp(2.2em,5vw,4em);
+margin-bottom:20px;
+text-shadow:0 0 20px #fff,0 0 40px gold;
+}
+
+.message{
+font-size:clamp(1em,2.5vw,1.4em);
+margin-bottom:25px;
+}
+
+.countdown span{
+display:inline-block;
+min-width:60px;
+padding:10px;
+margin:5px;
+background:rgba(255,255,255,.12);
+border-radius:10px;
+font-size:1.1em;
+}
+
+/* CONTROLS */
+.controls{
+position:fixed;
+top:15px;
+right:15px;
+z-index:20;
+}
+
+button{
+background:rgba(255,255,255,.15);
+border:none;
+color:white;
+padding:8px 14px;
+border-radius:6px;
+cursor:pointer;
+}
+button:hover{background:rgba(255,255,255,.3)}
+
+canvas{
+position:fixed;
+inset:0;
+pointer-events:none;
+}
+
+/* EFFECTS */
+.title.glitch{
+animation:glitch .15s infinite;
+}
+@keyframes glitch{
+0%{transform:translate(0)}
+20%{transform:translate(-2px,2px)}
+40%{transform:translate(2px,-2px)}
+60%{transform:translate(-1px,1px)}
+80%{transform:translate(1px,-1px)}
+100%{transform:translate(0)}
+}
+
+body.shake{
+animation:shake .4s infinite;
+}
+@keyframes shake{
+0%{transform:translate(0)}
+25%{transform:translate(3px,0)}
+50%{transform:translate(-3px,0)}
+75%{transform:translate(3px,0)}
+100%{transform:translate(0)}
+}
+</style>
+</head>
+
+<body>
+<div class="parallax"></div>
+
+<div class="controls">
+<button id="muteBtn">Mute</button>
+</div>
+
+<div class="container">
+<h1 id="title" class="title">Menuju Tahun Baru 2026</h1>
+
+<div class="message">
+Klik layar untuk kembang api<br>
+Double klik = super ledakan
+</div>
+
+<div class="countdown">
+<span id="days">0</span>Hari
+<span id="hours">0</span>Jam
+<span id="minutes">0</span>Menit
+<span id="seconds">0</span>Detik
+</div>
+</div>
+
+<canvas id="fx"></canvas>
+
+<audio id="bgMusic" loop>
+<source src="musik.mp3">
+</audio>
+
+<script>
+/* ===== CONFIG ===== */
+const nama = "Nyus"; // GANTI NAMA DI SINI
+const target = new Date("2026-01-01T00:00:00").getTime();
+
+/* ===== AUDIO SAFE ===== */
+const music = document.getElementById("bgMusic");
+let started=false;
+document.body.addEventListener("click",()=>{
+if(!started){
+music.volume=.3;
+music.play();
+started=true;
+}
+},{once:true});
+
+muteBtn.onclick=()=>{
+music.muted=!music.muted;
+muteBtn.textContent=music.muted?"Unmute":"Mute";
+};
+
+/* ===== FIREWORK ===== */
+const c=document.getElementById("fx");
+const ctx=c.getContext("2d");
+function resize(){c.width=innerWidth;c.height=innerHeight}
+resize();addEventListener("resize",resize);
+
+let p=[];
+class Part{
+constructor(x,y){
+this.x=x;this.y=y;
+this.vx=(Math.random()-.5)*10;
+this.vy=(Math.random()-.5)*10;
+this.life=90;
+}
+update(){
+this.x+=this.vx;
+this.y+=this.vy;
+this.vy+=.12;
+this.life--;
+}
+draw(){
+ctx.fillStyle=`hsl(${Math.random()*360},100%,60%)`;
+ctx.beginPath();
+ctx.arc(this.x,this.y,3,0,Math.PI*2);
+ctx.fill();
+}
+}
+
+function boom(x,y,n=120){
+for(let i=0;i<n;i++)p.push(new Part(x,y));
+}
+
+addEventListener("click",e=>boom(e.clientX,e.clientY));
+addEventListener("dblclick",e=>boom(e.clientX,e.clientY,240));
+
+(function anim(){
+ctx.clearRect(0,0,c.width,c.height);
+p=p.filter(x=>x.life>0);
+p.forEach(x=>{x.update();x.draw();});
+requestAnimationFrame(anim);
+})();
+
+/* ===== COUNTDOWN + EVENT ===== */
+let done=false;
+setInterval(()=>{
+const now=Date.now();
+let d=target-now;
+
+if(d<=0 && !done){
+done=true;
+const title=document.getElementById("title");
+
+document.body.classList.add("shake");
+title.classList.add("glitch");
+
+for(let i=0;i<8;i++){
+setTimeout(()=>boom(innerWidth/2,innerHeight/2,300),i*350);
+}
+
+setTimeout(()=>{
+document.body.classList.remove("shake");
+title.classList.remove("glitch");
+title.textContent=`🎉 Selamat Tahun Baru 2026, ${nama}! 🎉`;
+},2000);
+
+music.volume=.6;
+
+days.textContent=0;
+hours.textContent=0;
+minutes.textContent=0;
+seconds.textContent=0;
+return;
+}
+
+days.textContent=Math.floor(d/86400000);
+hours.textContent=Math.floor(d/3600000)%24;
+minutes.textContent=Math.floor(d/60000)%60;
+seconds.textContent=Math.floor(d/1000)%60;
+},1000);
+</script>
+</body>
+</html>
