@@ -228,31 +228,7 @@ window.open(
 }
 
 
-const c=document.getElementById("fx"),ctx=c.getContext("2d");
-function resize(){c.width=innerWidth;c.height=innerHeight}
-resize();addEventListener("resize",resize);
 
-let p=[];
-class Part{
-constructor(x,y){
-this.x=x;this.y=y;
-this.vx=(Math.random()-.5)*8;
-this.vy=(Math.random()-.5)*8;
-this.life=90;
-}
-update(){
-this.x+=this.vx;
-this.y+=this.vy;
-this.vy+=.12;
-this.life--;
-}
-draw(){
-ctx.fillStyle=`hsl(${Math.random()*360},100%,70%)`;
-ctx.beginPath();
-ctx.arc(this.x,this.y,3,0,Math.PI*2);
-ctx.fill();
-}
-}
 function boom(x,y,n=140){
 for(let i=0;i<n;i++)p.push(new Part(x,y));
 }
