@@ -2,45 +2,40 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width,initial-scale=1.0">
-<title>One Shared Future</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Happy New Year</title>
 
-<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600&family=Playfair+Display:wght@600&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@600&family=Inter&display=swap" rel="stylesheet">
 
 <style>
-*{box-sizing:border-box}
+*{margin:0;padding:0;box-sizing:border-box}
 body{
-margin:0;
+height:100vh;
 overflow:hidden;
 font-family:Inter,system-ui;
 color:white;
-background:black;
 text-align:center;
 }
 
+/* BACKGROUND BUMI (TIDAK GELAP) */
+body::before{
+content:"";
+position:fixed;
+inset:0;
+background:url("https://awsimages.detik.net.id/community/media/visual/2020/05/14/30440740-1343-4e4e-9a9d-780604ec553d.jpeg?w=1200")
+center/cover no-repeat;
+z-index:-2;
+}
+
+/* CANVAS FIREWORK */
 canvas{
 position:fixed;
 inset:0;
 z-index:1;
+pointer-events:none;
 }
 
-.earth{
-position:fixed;
-inset:0;
-background:
-background:url("https://awsimages.detik.net.id/community/media/visual/2020/05/14/30440740-1343-4e4e-9a9d-780604ec553d.jpeg?w=1200")
-center/cover no-repeat;
-z-index:-2;
-filter:brightness(1.15) contrast(1.05);
-}
-
-
-@keyframes float{
-0%{transform:scale(1.08)}
-50%{transform:scale(1.12) translateY(-20px)}
-100%{transform:scale(1.08)}
-}
-
+/* CONTENT */
 .container{
 position:absolute;
 top:50%;
@@ -49,20 +44,20 @@ transform:translate(-50%,-50%);
 z-index:5;
 width:90%;
 max-width:900px;
+backdrop-filter:blur(6px);
+background:rgba(0,0,0,.25);
+padding:40px;
+border-radius:24px;
 }
 
 h1{
 font-family:"Playfair Display",serif;
-font-size:clamp(3em,6vw,4.5em);
-background:linear-gradient(120deg,#f5e6b8,#ffffff,#9fd3ff);
--webkit-background-clip:text;
--webkit-text-fill-color:transparent;
-margin-bottom:16px;
+font-size:clamp(2.8em,6vw,4em);
+margin-bottom:12px;
 }
 
-.message{
+p{
 font-size:1.2em;
-opacity:.9;
 margin-bottom:22px;
 }
 
@@ -70,16 +65,16 @@ margin-bottom:22px;
 display:inline-block;
 padding:10px 14px;
 margin:6px;
-background:rgba(255,255,255,.15);
+background:rgba(255,255,255,.2);
 border-radius:14px;
 }
 
 button{
-margin-top:22px;
+margin-top:20px;
 padding:12px 26px;
-border-radius:14px;
+border-radius:16px;
 border:none;
-background:rgba(255,255,255,.2);
+background:rgba(255,255,255,.25);
 color:white;
 cursor:pointer;
 }
@@ -90,14 +85,11 @@ audio{display:none}
 
 <body>
 
-<canvas id="fireworks"></canvas>
-<div class="earth"></div>
+<canvas id="fw"></canvas>
 
 <div class="container">
-<h1 id="title">One Shared Future</h1>
-<div class="message" id="msg">
-A new day. A new year. New possibilities.
-</div>
+<h1 id="title">Welcoming a New Year</h1>
+<p id="text">Different lives. Different places. One shared future.</p>
 
 <button id="share">Share this moment</button>
 
@@ -109,20 +101,25 @@ A new day. A new year. New possibilities.
 </div>
 </div>
 
-<audio id="bgm" loop>
-<source src="musik.mp3">
+<audio id="music" loop>
+<source src="https://cdn.pixabay.com/download/audio/2023/12/26/audio_63c2c57c7d.mp3">
 </audio>
 
 <script>
 /* MUSIC */
 document.body.addEventListener("click",()=>{
-document.getElementById("bgm").play();
+music.play();
 },{once:true});
 
 /* SHARE */
 share.onclick=()=>{
-const data={title:"One Shared Future",text:msg.textContent,url:location.href};
-navigator.share?navigator.share(data):open("https://wa.me/?text="+encodeURIComponent(data.text+"\n"+data.url));
+const data={
+title:"Happy New Year",
+text:text.textContent,
+url:location.href
+};
+navigator.share?navigator.share(data):
+window.open("https://wa.me/?text="+encodeURIComponent(data.text+"\n"+data.url));
 };
 
 /* COUNTDOWN */
@@ -130,8 +127,8 @@ const target=new Date("2026-01-01T00:00:00").getTime();
 setInterval(()=>{
 let diff=target-Date.now();
 if(diff<=0){
-title.textContent="Happy New Year 🌍";
-msg.textContent="One planet. One moment. One shared future.";
+title.textContent="Happy New Year 🎆";
+text.textContent="One planet. One moment. One shared future.";
 return;
 }
 d.textContent=Math.floor(diff/86400000);
@@ -141,16 +138,15 @@ s.textContent=Math.floor(diff/1000)%60;
 },1000);
 
 /* FIREWORKS */
-const c=document.getElementById("fireworks"),x=c.getContext("2d");
-resize();
-window.onresize=resize;
+const c=document.getElementById("fw"),ctx=c.getContext("2d");
+resize();window.onresize=resize;
 function resize(){c.width=innerWidth;c.height=innerHeight}
 
-let particles=[];
-function boom(px,py,power=80){
-for(let i=0;i<power;i++){
-particles.push({
-x:px,y:py,
+let p=[];
+function boom(x,y,n=80){
+for(let i=0;i<n;i++){
+p.push({
+x,y,
 vx:(Math.random()-0.5)*6,
 vy:(Math.random()-0.5)*6,
 life:100,
@@ -160,23 +156,19 @@ color:`hsl(${Math.random()*360},100%,60%)`
 }
 
 addEventListener("click",e=>boom(e.clientX,e.clientY));
-addEventListener("dblclick",e=>boom(e.clientX,e.clientY,200));
+addEventListener("dblclick",e=>boom(e.clientX,e.clientY,180));
 
 (function loop(){
 requestAnimationFrame(loop);
-x.fillStyle="rgba(0,0,0,.2)";
-x.fillRect(0,0,c.width,c.height);
-particles=particles.filter(p=>{
-p.x+=p.vx;
-p.y+=p.vy;
-p.life--;
-x.fillStyle=p.color;
-x.fillRect(p.x,p.y,3,3);
-return p.life>0;
+ctx.clearRect(0,0,c.width,c.height);
+p=p.filter(o=>{
+o.x+=o.vx;o.y+=o.vy;o.life--;
+ctx.fillStyle=o.color;
+ctx.fillRect(o.x,o.y,3,3);
+return o.life>0;
 });
 })();
 </script>
 
 </body>
 </html>
-
