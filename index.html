@@ -13,12 +13,13 @@ body{
 margin:0;
 height:100vh;
 overflow:hidden;
-font-family:Inter,system-ui,Segoe UI,Roboto,Arial,sans-serif;
+font-family:Inter,system-ui,Arial;
 color:white;
-text-align:center;
 background:black;
+text-align:center;
 }
 
+/* ===== BACKGROUND EARTH ===== */
 .earth{
 position:fixed;
 inset:0;
@@ -26,27 +27,17 @@ background:
 linear-gradient(to bottom,rgba(0,0,0,.55),rgba(0,0,0,.9)),
 url("https://awsimages.detik.net.id/community/media/visual/2020/05/14/30440740-1343-4e4e-9a9d-780604ec553d.jpeg?w=1200")
 center/cover no-repeat;
-animation:earthFloat 80s ease-in-out infinite;
-transform:scale(1.07);
+animation:float 90s ease-in-out infinite;
 z-index:-2;
 }
 
-@keyframes earthFloat{
-0%{transform:scale(1.07) translateY(0)}
-50%{transform:scale(1.1) translateY(-18px)}
-100%{transform:scale(1.07) translateY(0)}
+@keyframes float{
+0%{transform:scale(1.08) translateY(0)}
+50%{transform:scale(1.12) translateY(-20px)}
+100%{transform:scale(1.08) translateY(0)}
 }
 
-.earth::after{
-content:"";
-position:absolute;
-inset:0;
-background:radial-gradient(circle at center,
-rgba(0,0,0,.2) 0%,
-rgba(0,0,0,.75) 65%,
-rgba(0,0,0,.95) 100%);
-}
-
+/* ===== CONTENT ===== */
 .container{
 position:absolute;
 top:50%;
@@ -54,79 +45,66 @@ left:50%;
 transform:translate(-50%,-50%);
 width:90%;
 max-width:900px;
-z-index:10;
+z-index:5;
 }
 
-#title{
+h1{
 font-family:"Playfair Display",serif;
-font-size:clamp(2.6em,5.5vw,4.2em);
-margin-bottom:22px;
-background:linear-gradient(120deg,#f5e8b8,#ffffff,#a7d8ff);
+font-size:clamp(2.8em,6vw,4.5em);
+margin-bottom:18px;
+background:linear-gradient(120deg,#f5e6b8,#ffffff,#9fd3ff);
 -webkit-background-clip:text;
 -webkit-text-fill-color:transparent;
-animation:breath 6s ease-in-out infinite;
+animation:fadeIn 1.5s ease forwards;
 }
 
-#title span{
-display:inline-block;
-opacity:0;
-animation:wordIn 1.2s ease forwards;
-}
-
-@keyframes wordIn{
-from{opacity:0;transform:translateY(12px);filter:blur(4px)}
-to{opacity:1;transform:translateY(0);filter:blur(0)}
-}
-
-@keyframes breath{
-0%{filter:brightness(1)}
-50%{filter:brightness(1.15)}
-100%{filter:brightness(1)}
+@keyframes fadeIn{
+from{opacity:0;transform:translateY(20px)}
+to{opacity:1;transform:translateY(0)}
 }
 
 .message{
-font-size:clamp(1em,2.4vw,1.3em);
-margin-bottom:28px;
-line-height:1.6;
+font-size:clamp(1em,2.3vw,1.3em);
+margin-bottom:26px;
 opacity:.95;
 }
 
 .countdown span{
 display:inline-block;
-min-width:70px;
+min-width:72px;
 padding:12px;
 margin:6px;
-background:rgba(255,255,255,.12);
-border-radius:12px;
-backdrop-filter:blur(5px);
+background:rgba(255,255,255,.15);
+border-radius:14px;
+backdrop-filter:blur(6px);
 }
 
 button{
-background:rgba(255,255,255,.18);
+margin-top:24px;
+padding:12px 26px;
+border-radius:14px;
 border:none;
+background:rgba(255,255,255,.2);
 color:white;
-padding:12px 22px;
-border-radius:12px;
-cursor:pointer;
 font-size:1em;
+cursor:pointer;
 }
-button:hover{background:rgba(255,255,255,.3)}
+button:hover{background:rgba(255,255,255,.35)}
 
-canvas{
-position:fixed;
-inset:0;
-pointer-events:none;
-}
+audio{display:none}
 </style>
 </head>
 
 <body>
+
 <div class="earth"></div>
 
 <div class="container">
-<h1 id="title"></h1>
+<h1 id="title">One Shared Future</h1>
 
-<div class="message" id="message"></div>
+<div class="message" id="message">
+A new day. A new year. New possibilities.
+</div>
 
 <button id="shareBtn">Share this moment</button>
 
@@ -138,104 +116,41 @@ pointer-events:none;
 </div>
 </div>
 
-<canvas id="fx"></canvas>
+<!-- ===== MUSIC ===== -->
+<audio id="bgm" loop>
+<source src="https://cdn.pixabay.com/download/audio/2023/12/26/audio_63c2c57c7d.mp3?filename=hopeful-future-189854.mp3" type="audio/mpeg">
+</audio>
 
 <script>
-/* ===== TITLE WORD BY WORD ===== */
-const titleWords=["Welcoming","a","New","Year"];
-const titleEl=document.getElementById("title");
-titleWords.forEach((w,i)=>{
-const s=document.createElement("span");
-s.textContent=w+" ";
-s.style.animationDelay=(i*0.6)+"s";
-titleEl.appendChild(s);
-});
+/* ===== AUTO PLAY MUSIC (SAFE) ===== */
+const music=document.getElementById("bgm");
+document.body.addEventListener("click",()=>music.play(),{once:true});
 
-/* ===== TIME-BASED MESSAGE ===== */
-const hour=new Date().getHours();
-let timeMessage="Different lives. Different places. One shared future.";
-
-if(hour<5) timeMessage="A quiet moment before a new beginning.";
-else if(hour<12) timeMessage="A new day. A new year. New possibilities.";
-else if(hour<18) timeMessage="Time moves forward — and so do we.";
-
-message.textContent=timeMessage;
-
-/* ===== UNIVERSAL SHARE ===== */
+/* ===== SHARE UNIVERSAL ===== */
 document.getElementById("shareBtn").onclick=()=>{
 const data={
 title:"One Shared Future",
-text:message.textContent,
+text:document.getElementById("message").textContent,
 url:location.href
 };
-
 if(navigator.share){
 navigator.share(data).catch(()=>{});
 }else{
-const fallback=data.text+"\n\n"+data.url;
-window.open(
-"https://wa.me/?text="+encodeURIComponent(fallback)
-);
+window.open("https://wa.me/?text="+encodeURIComponent(data.text+"\n\n"+data.url));
 }
 };
 
-/* ===== FIREWORK ===== */
-const c=document.getElementById("fx"),ctx=c.getContext("2d");
-function resize(){c.width=innerWidth;c.height=innerHeight}
-resize();addEventListener("resize",resize);
-
-let p=[];
-class Part{
-constructor(x,y){
-this.x=x;this.y=y;
-this.vx=(Math.random()-.5)*8;
-this.vy=(Math.random()-.5)*8;
-this.life=90;
-}
-update(){
-this.x+=this.vx;
-this.y+=this.vy;
-this.vy+=.12;
-this.life--;
-}
-draw(){
-ctx.fillStyle=`hsl(${Math.random()*360},100%,70%)`;
-ctx.beginPath();
-ctx.arc(this.x,this.y,3,0,Math.PI*2);
-ctx.fill();
-}
-}
-function boom(x,y,n=140){
-for(let i=0;i<n;i++)p.push(new Part(x,y));
-}
-addEventListener("click",e=>boom(e.clientX,e.clientY));
-addEventListener("dblclick",e=>boom(e.clientX,e.clientY,260));
-
-(function anim(){
-ctx.clearRect(0,0,c.width,c.height);
-p=p.filter(x=>x.life>0);
-p.forEach(x=>{x.update();x.draw();});
-requestAnimationFrame(anim);
-})();
-
 /* ===== COUNTDOWN ===== */
 const target=new Date("2026-01-01T00:00:00").getTime();
-let done=false;
 
 setInterval(()=>{
 const now=Date.now();
 let diff=target-now;
 
 if(diff<=0){
-if(!done){
-done=true;
-titleEl.textContent="Happy New Year — To Everyone, Everywhere";
-message.textContent="One planet. One moment. One shared future.";
-document.getElementById("shareBtn").style.display="none";
-for(let i=0;i<6;i++){
-setTimeout(()=>boom(innerWidth/2,innerHeight/2,300),i*400);
-}
-}
+document.getElementById("title").textContent="Happy New Year 🌍";
+document.getElementById("message").textContent=
+"One planet. One moment. One shared future.";
 [d,h,m,s].forEach(x=>x.textContent=0);
 return;
 }
@@ -246,5 +161,6 @@ m.textContent=Math.floor(diff/60000)%60;
 s.textContent=Math.floor(diff/1000)%60;
 },1000);
 </script>
+
 </body>
 </html>
