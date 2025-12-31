@@ -17,7 +17,7 @@ color:white;
 text-align:center;
 }
 
-/* BACKGROUND BUMI (TIDAK GELAP) */
+/* BACKGROUND BUMI – TERANG */
 body::before{
 content:"";
 position:fixed;
@@ -27,12 +27,12 @@ center/cover no-repeat;
 z-index:-2;
 }
 
-/* CANVAS FIREWORK */
+/* CANVAS */
 canvas{
 position:fixed;
 inset:0;
-z-index:1;
 pointer-events:none;
+z-index:1;
 }
 
 /* CONTENT */
@@ -44,10 +44,10 @@ transform:translate(-50%,-50%);
 z-index:5;
 width:90%;
 max-width:900px;
-backdrop-filter:blur(6px);
-background:rgba(0,0,0,.25);
 padding:40px;
 border-radius:24px;
+background:rgba(0,0,0,.18);
+backdrop-filter:blur(4px);
 }
 
 h1{
@@ -65,7 +65,7 @@ margin-bottom:22px;
 display:inline-block;
 padding:10px 14px;
 margin:6px;
-background:rgba(255,255,255,.2);
+background:rgba(255,255,255,.25);
 border-radius:14px;
 }
 
@@ -102,7 +102,7 @@ audio{display:none}
 </div>
 
 <audio id="music" loop>
-<source src="musik.mp3">
+<source src="https://cdn.pixabay.com/download/audio/2023/12/26/audio_63c2c57c7d.mp3">
 </audio>
 
 <script>
@@ -118,55 +118,82 @@ title:"Happy New Year",
 text:text.textContent,
 url:location.href
 };
-navigator.share?navigator.share(data):
-window.open("https://wa.me/?text="+encodeURIComponent(data.text+"\n"+data.url));
+navigator.share
+? navigator.share(data)
+: window.open("https://wa.me/?text="+encodeURIComponent(data.text+"\n"+data.url));
 };
 
-/* COUNTDOWN */
-const target=new Date("2026-01-01T00:00:00").getTime();
+/* ===== TARGET 1 JANUARI 00:00 (LOKAL SETIAP NEGARA) ===== */
+const now = new Date();
+const target = new Date(now.getFullYear()+1, 0, 1, 0, 0, 0).getTime();
+
+let fired=false;
+let fireInterval=null;
+
 setInterval(()=>{
-let diff=target-Date.now();
-if(diff<=0){
-title.textContent="Happy New Year 🎆";
+let diff = target - Date.now();
+
+if(diff <= 0){
+title.textContent="Happy New Year ??";
 text.textContent="One planet. One moment. One shared future.";
+
+if(!fired){
+fired=true;
+
+/* firework jalan 12 detik */
+fireInterval = setInterval(()=>{
+boom(
+Math.random()*innerWidth,
+Math.random()*innerHeight,
+180
+);
+},300);
+
+setTimeout(()=>clearInterval(fireInterval),12000);
+}
 return;
 }
-d.textContent=Math.floor(diff/86400000);
-h.textContent=Math.floor(diff/3600000)%24;
-m.textContent=Math.floor(diff/60000)%60;
-s.textContent=Math.floor(diff/1000)%60;
+
+d.textContent = Math.floor(diff/86400000);
+h.textContent = Math.floor(diff/3600000)%24;
+m.textContent = Math.floor(diff/60000)%60;
+s.textContent = Math.floor(diff/1000)%60;
 },1000);
 
-/* FIREWORKS */
-const c=document.getElementById("fireworks"),x=c.getContext("2d");
+/* ===== FIREWORK ENGINE ===== */
+const canvas=document.getElementById("fw");
+const ctx=canvas.getContext("2d");
 resize();
 window.onresize=resize;
-function resize(){c.width=innerWidth;c.height=innerHeight}
+function resize(){canvas.width=innerWidth;canvas.height=innerHeight}
 
 let particles=[];
-function boom(px,py,power=80){
+
+function boom(x,y,power=80){
 for(let i=0;i<power;i++){
 particles.push({
-x:px,y:py,
+x,y,
 vx:(Math.random()-0.5)*6,
 vy:(Math.random()-0.5)*6,
-life:100,
+life:120,
 color:`hsl(${Math.random()*360},100%,60%)`
 });
 }
 }
 
 addEventListener("click",e=>boom(e.clientX,e.clientY));
-addEventListener("dblclick",e=>boom(e.clientX,e.clientY,180));
+addEventListener("dblclick",e=>boom(e.clientX,e.clientY,220));
 
 (function loop(){
 requestAnimationFrame(loop);
-ctx.clearRect(0,0,c.width,c.height);
-p=p.filter(o=>{
-o.x+=o.vx;o.y+=o.vy;o.life--;
-ctx.fillStyle=o.color;
-ctx.fillRect(o.x,o.y,3,3);
-return o.life>0;
+ctx.clearRect(0,0,canvas.width,canvas.height);
+particles = particles.filter(p=>{
+p.x+=p.vx;
+p.y+=p.vy;
+p.life--;
+ctx.fillStyle=p.color;
+ctx.fillRect(p.x,p.y,3,3);
+return p.life>0;
 });
 })();
 </script>
