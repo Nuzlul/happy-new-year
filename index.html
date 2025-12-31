@@ -138,15 +138,16 @@ s.textContent=Math.floor(diff/1000)%60;
 },1000);
 
 /* FIREWORKS */
-const c=document.getElementById("fw"),ctx=c.getContext("2d");
-resize();window.onresize=resize;
+const c=document.getElementById("fireworks"),x=c.getContext("2d");
+resize();
+window.onresize=resize;
 function resize(){c.width=innerWidth;c.height=innerHeight}
 
-let p=[];
-function boom(x,y,n=80){
-for(let i=0;i<n;i++){
-p.push({
-x,y,
+let particles=[];
+function boom(px,py,power=80){
+for(let i=0;i<power;i++){
+particles.push({
+x:px,y:py,
 vx:(Math.random()-0.5)*6,
 vy:(Math.random()-0.5)*6,
 life:100,
