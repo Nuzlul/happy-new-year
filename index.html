@@ -206,10 +206,27 @@ message.textContent=texts[i];
 i=(i+1)%texts.length;
 },5000);
 
+  
 function share(){
-const text="A new year is coming.\nMay the future be brighter for all of us.\n\n";
-window.open(`https://wa.me/?text=${encodeURIComponent(text+location.href)}`);
+const shareData={
+title:"Welcoming a New Year",
+text:"Different lives. Different places. One shared future.",
+url:location.href
+};
+
+if(navigator.share){
+navigator.share(shareData)
+.catch(()=>{});
+}else{
+const fallbackText=
+shareData.text + "\n\n" + shareData.url;
+
+window.open(
+"https://wa.me/?text=" + encodeURIComponent(fallbackText)
+);
 }
+}
+
 
 const c=document.getElementById("fx"),ctx=c.getContext("2d");
 function resize(){c.width=innerWidth;c.height=innerHeight}
