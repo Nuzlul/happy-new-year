@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="viewport" content="width=device-width,initial-scale=1.0">
 <title>One Shared Future</title>
 
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600&family=Playfair+Display:wght@600&display=swap" rel="stylesheet">
@@ -11,85 +11,78 @@
 *{box-sizing:border-box}
 body{
 margin:0;
-height:100vh;
 overflow:hidden;
-font-family:Inter,system-ui,Arial;
+font-family:Inter,system-ui;
 color:white;
 background:black;
 text-align:center;
 }
 
-/* ===== BACKGROUND EARTH ===== */
+canvas{
+position:fixed;
+inset:0;
+z-index:1;
+}
+
 .earth{
 position:fixed;
 inset:0;
 background:
-linear-gradient(to bottom,rgba(0,0,0,.55),rgba(0,0,0,.9)),
+linear-gradient(to bottom,rgba(0,0,0,.5),rgba(0,0,0,.85)),
 url("https://awsimages.detik.net.id/community/media/visual/2020/05/14/30440740-1343-4e4e-9a9d-780604ec553d.jpeg?w=1200")
 center/cover no-repeat;
 animation:float 90s ease-in-out infinite;
-z-index:-2;
+z-index:0;
 }
 
 @keyframes float{
-0%{transform:scale(1.08) translateY(0)}
+0%{transform:scale(1.08)}
 50%{transform:scale(1.12) translateY(-20px)}
-100%{transform:scale(1.08) translateY(0)}
+100%{transform:scale(1.08)}
 }
 
-/* ===== CONTENT ===== */
 .container{
 position:absolute;
 top:50%;
 left:50%;
 transform:translate(-50%,-50%);
+z-index:5;
 width:90%;
 max-width:900px;
-z-index:5;
 }
 
 h1{
 font-family:"Playfair Display",serif;
-font-size:clamp(2.8em,6vw,4.5em);
-margin-bottom:18px;
+font-size:clamp(3em,6vw,4.5em);
 background:linear-gradient(120deg,#f5e6b8,#ffffff,#9fd3ff);
 -webkit-background-clip:text;
 -webkit-text-fill-color:transparent;
-animation:fadeIn 1.5s ease forwards;
-}
-
-@keyframes fadeIn{
-from{opacity:0;transform:translateY(20px)}
-to{opacity:1;transform:translateY(0)}
+margin-bottom:16px;
 }
 
 .message{
-font-size:clamp(1em,2.3vw,1.3em);
-margin-bottom:26px;
-opacity:.95;
+font-size:1.2em;
+opacity:.9;
+margin-bottom:22px;
 }
 
 .countdown span{
 display:inline-block;
-min-width:72px;
-padding:12px;
+padding:10px 14px;
 margin:6px;
 background:rgba(255,255,255,.15);
 border-radius:14px;
-backdrop-filter:blur(6px);
 }
 
 button{
-margin-top:24px;
+margin-top:22px;
 padding:12px 26px;
 border-radius:14px;
 border:none;
 background:rgba(255,255,255,.2);
 color:white;
-font-size:1em;
 cursor:pointer;
 }
-button:hover{background:rgba(255,255,255,.35)}
 
 audio{display:none}
 </style>
@@ -97,16 +90,16 @@ audio{display:none}
 
 <body>
 
+<canvas id="fireworks"></canvas>
 <div class="earth"></div>
 
 <div class="container">
 <h1 id="title">One Shared Future</h1>
-
-<div class="message" id="message">
+<div class="message" id="msg">
 A new day. A new year. New possibilities.
 </div>
 
-<button id="shareBtn">Share this moment</button>
+<button id="share">Share this moment</button>
 
 <div class="countdown">
 <span id="d">0</span>Days
@@ -116,51 +109,74 @@ A new day. A new year. New possibilities.
 </div>
 </div>
 
-<!-- ===== MUSIC ===== -->
 <audio id="bgm" loop>
-<source src"musik.mp3" type="audio/mpeg">
+<source src="https://cdn.pixabay.com/download/audio/2023/12/26/audio_63c2c57c7d.mp3">
 </audio>
 
 <script>
-/* ===== AUTO PLAY MUSIC (SAFE) ===== */
-const music=document.getElementById("bgm");
-document.body.addEventListener("click",()=>music.play(),{once:true});
+/* MUSIC */
+document.body.addEventListener("click",()=>{
+document.getElementById("bgm").play();
+},{once:true});
 
-/* ===== SHARE UNIVERSAL ===== */
-document.getElementById("shareBtn").onclick=()=>{
-const data={
-title:"One Shared Future",
-text:document.getElementById("message").textContent,
-url:location.href
-};
-if(navigator.share){
-navigator.share(data).catch(()=>{});
-}else{
-window.open("https://wa.me/?text="+encodeURIComponent(data.text+"\n\n"+data.url));
-}
+/* SHARE */
+share.onclick=()=>{
+const data={title:"One Shared Future",text:msg.textContent,url:location.href};
+navigator.share?navigator.share(data):open("https://wa.me/?text="+encodeURIComponent(data.text+"\n"+data.url));
 };
 
-/* ===== COUNTDOWN ===== */
+/* COUNTDOWN */
 const target=new Date("2026-01-01T00:00:00").getTime();
-
 setInterval(()=>{
-const now=Date.now();
-let diff=target-now;
-
+let diff=target-Date.now();
 if(diff<=0){
-document.getElementById("title").textContent="Happy New Year 🌍";
-document.getElementById("message").textContent=
-"One planet. One moment. One shared future.";
-[d,h,m,s].forEach(x=>x.textContent=0);
+title.textContent="Happy New Year 🌍";
+msg.textContent="One planet. One moment. One shared future.";
 return;
 }
-
 d.textContent=Math.floor(diff/86400000);
 h.textContent=Math.floor(diff/3600000)%24;
 m.textContent=Math.floor(diff/60000)%60;
 s.textContent=Math.floor(diff/1000)%60;
 },1000);
+
+/* FIREWORKS */
+const c=document.getElementById("fireworks"),x=c.getContext("2d");
+resize();
+window.onresize=resize;
+function resize(){c.width=innerWidth;c.height=innerHeight}
+
+let particles=[];
+function boom(px,py,power=80){
+for(let i=0;i<power;i++){
+particles.push({
+x:px,y:py,
+vx:(Math.random()-0.5)*6,
+vy:(Math.random()-0.5)*6,
+life:100,
+color:`hsl(${Math.random()*360},100%,60%)`
+});
+}
+}
+
+addEventListener("click",e=>boom(e.clientX,e.clientY));
+addEventListener("dblclick",e=>boom(e.clientX,e.clientY,200));
+
+(function loop(){
+requestAnimationFrame(loop);
+x.fillStyle="rgba(0,0,0,.2)";
+x.fillRect(0,0,c.width,c.height);
+particles=particles.filter(p=>{
+p.x+=p.vx;
+p.y+=p.vy;
+p.life--;
+x.fillStyle=p.color;
+x.fillRect(p.x,p.y,3,3);
+return p.life>0;
+});
+})();
 </script>
 
 </body>
 </html>
+
